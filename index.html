@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수학 활동 역량 분석기 - 시니어 개발자</title>
+    <!-- Tailwind CSS CDN 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Inter 폰트 적용 (Tailwind 기본 설정) */
+        body { font-family: 'Inter', sans-serif; }
+        /* 스크롤바 커스터마이징 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+
+    <!-- 메인 컨테이너 -->
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center py-6 mb-8 border-b border-indigo-200">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-indigo-700">수학 활동 역량 분석기</h1>
+            <p class="text-lg text-gray-600 mt-2">공통수학1, 2 활동 결과를 6가지 역량으로 심층 분석합니다.</p>
+        </header>
+
+        <!-- 입력 폼 섹션 -->
+        <section id="input-section" class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">활동 내용 입력</h2>
+            
+            <div class="mb-4">
+                <label for="activity-description" class="block text-sm font-medium text-gray-700 mb-2">
+                    학생 활동 내용 상세 설명 (300자 이상 권장)
+                </label>
+                <textarea id="activity-description" rows="8" 
+                          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out resize-y"
+                          placeholder="예: '전기요금 계산을 위한 다항식 함수 모델링 활동'을 수행했습니다. 지난 3개월치 전기 사용량 데이터를 수집하여 2차 함수로 근사 모델을 만들고, 이를 바탕으로 다음 달 예상 요금을 예측했습니다. 또한, 가족 회의를 통해 에너지 절약 방안을 창의적으로 제안했습니다."></textarea>
+            </div>
+
+            <button id="analyze-button" 
+                    class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-indigo-500/50">
+                활동 역량 분석 시작
+            </button>
+        </section>
+
+        <!-- 결과 섹션 -->
+        <section id="result-section" class="hidden">
+            <div id="loading-indicator" class="hidden text-center py-10">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full mb-3"></div>
+                <p class="text-indigo-600 font-medium">AI 전문가가 활동 결과를 심층 분석 중입니다...</p>
+            </div>
+
+            <div id="analysis-results" class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-indigo-500">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                    활동 분석 결과 및 역량 평가
+                </h2>
+
+                <!-- 종합 요약 -->
+                <div class="mb-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                    <h3 class="text-lg font-bold text-indigo-700 mb-2">종합 평가</h3>
+                    <p id="overall-summary" class="text-gray-700 leading-relaxed"></p>
+                </div>
+
+                <!-- 문제 해결 능력 (핵심 평가 요소) -->
+                <div class="mb-6 p-4 bg-red-50 rounded-lg border border-red-200">
+                    <h3 class="text-xl font-bold text-red-700 mb-3 flex justify-between items-center">
+                        1. 문제 해결 (Problem Solving)
+                        <span id="problem-solving-score" class="text-2xl font-extrabold"></span>
+                    </h3>
+                    <p id="problem-solving-analysis" class="text-gray-700"></p>
+                </div>
+
+                <!-- 6가지 역량 상세 분석 -->
+                <div id="competency-details">
+                    <!-- Placeholder for other competencies -->
+                </div>
+
+                <!-- 향후 제안 -->
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="text-xl font-bold text-green-700 mb-3 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M3.636 5.636l.707.707m0 12.728l-.707.707m12.728-.707l.707.707M6.5 12h-1m12 0h-1M9 16.707A5.996 5.996 0 0012 11c0-3.314-2.686-6-6-6a5.996 5.996 0 00-2.364.444"/>
+                        </svg>
+                        추가 학습 및 활동 제안
+                    </h3>
+                    <ul id="suggestions-list" class="list-disc pl-5 space-y-2 text-gray-700">
+                        <!-- Suggestions will be populated here -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 오류 메시지 표시 영역 -->
+            <div id="error-message" class="hidden mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                <p class="font-bold">오류 발생:</p>
+                <p id="error-text"></p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 전역 상수 및 변수 설정
+        const analyzeButton = document.getElementById('analyze-button');
+        const activityDescription = document.getElementById('activity-description');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const resultSection = document.getElementById('result-section');
+        const analysisResults = document.getElementById('analysis-results');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const competencyDetails = document.getElementById('competency-details');
+        
+        // Gemini API 설정
+        // NOTE: Canvas 환경에서 __api_key는 자동으로 설정되므로 빈 문자열로 둡니다.
+        const apiKey = ""; 
+        const modelName = 'gemini-2.5-flash-preview-09-2025';
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+
+        // 수학과 교육과정 6가지 역량 정의
+        const competencies = [
+            { id: 'problem_solving', name: '문제 해결', scoreKey: 'problem_solving_score', color: 'red' }, // 핵심 평가
+            { id: 'reasoning', name: '추론', color: 'blue' },
+            { id: 'creativity_convergence', name: '창의·융합', color: 'purple' },
+            { id: 'communication', name: '의사소통', color: 'yellow' },
+            { id: 'information_processing', name: '정보 처리', color: 'teal' },
+            { id: 'attitude_practice', name: '태도 및 실천', color: 'green' }
+        ];
+
+        // JSON 응답 스키마 정의
+        const responseSchema = {
+            type: "OBJECT",
+            properties: {
+                overall_summary: { type: "STRING", description: "학생 활동 결과에 대한 종합적인 한줄 요약 및 평가" },
+                problem_solving_score: { type: "NUMBER", description: "문제 해결 능력 점수 (1점에서 5점 사이)", minimum: 1, maximum: 5 },
+                problem_solving_analysis: { type: "STRING", description: "문제 해결 역량에 대한 상세 분석 및 평가" },
+                reasoning_analysis: { type: "STRING", description: "추론 역량에 대한 상세 분석 및 평가" },
+                creativity_convergence_analysis: { type: "STRING", description: "창의·융합 역량에 대한 상세 분석 및 평가" },
+                communication_analysis: { type: "STRING", description: "의사소통 역량에 대한 상세 분석 및 평가" },
+                information_processing_analysis: { type: "STRING", description: "정보 처리 역량에 대한 상세 분석 및 평가" },
+                attitude_practice_analysis: { type: "STRING", description: "태도 및 실천 역량에 대한 상세 분석 및 평가" },
+                suggestions: {
+                    type: "ARRAY",
+                    description: "학생의 성장을 위한 구체적인 향후 학습 활동 제안 2~3가지",
+                    items: { type: "STRING" }
+                }
+            },
+            required: [
+                "overall_summary", "problem_solving_score", "problem_solving_analysis", 
+                "reasoning_analysis", "creativity_convergence_analysis", 
+                "communication_analysis", "information_processing_analysis", 
+                "attitude_practice_analysis", "suggestions"
+            ]
+        };
+
+        // UI에 분석 결과를 렌더링하는 함수
+        function renderResults(data) {
+            // 종합 요약
+            document.getElementById('overall-summary').innerText = data.overall_summary;
+
+            // 문제 해결 (별도 강조)
+            const scoreHtml = getScoreHtml(data.problem_solving_score);
+            document.getElementById('problem-solving-score').innerHTML = scoreHtml;
+            document.getElementById('problem-solving-analysis').innerText = data.problem_solving_analysis;
+
+            // 나머지 역량 동적 생성
+            competencyDetails.innerHTML = '';
+            competencies.forEach(comp => {
+                if (comp.id !== 'problem_solving') {
+                    const analysisKey = `${comp.id}_analysis`;
+                    const analysisText = data[analysisKey] || '분석 내용을 찾을 수 없습니다.';
+                    const html = `
+                        <div class="mb-5 p-4 bg-${comp.color}-50 rounded-lg border border-${comp.color}-200">
+                            <h3 class="text-lg font-bold text-${comp.color}-700 mb-2">
+                                ${comp.name} (${comp.id.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')})
+                            </h3>
+                            <p class="text-gray-700">${analysisText}</p>
+                        </div>
+                    `;
+                    competencyDetails.insertAdjacentHTML('beforeend', html);
+                }
+            });
+
+            // 제안 사항
+            const suggestionsList = document.getElementById('suggestions-list');
+            suggestionsList.innerHTML = '';
+            data.suggestions.forEach(suggestion => {
+                const li = document.createElement('li');
+                li.className = 'text-gray-700';
+                li.innerText = suggestion;
+                suggestionsList.appendChild(li);
+            });
+
+            resultSection.classList.remove('hidden');
+            analysisResults.classList.remove('hidden');
+        }
+
+        // 점수(1~5)에 따른 별 모양 HTML 생성
+        function getScoreHtml(score) {
+            const fullStar = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400 inline-block" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.01 8.72c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>';
+            const emptyStar = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300 inline-block" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.01 8.72c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>';
+            
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                stars += i <= score ? fullStar : emptyStar;
+            }
+            return stars;
+        }
+
+        // Gemini API 호출 및 결과 처리 함수
+        async function analyzeActivity() {
+            const description = activityDescription.value.trim();
+
+            // 유효성 검사
+            if (description.length < 50) {
+                showError("활동 내용을 50자 이상 자세히 입력해주세요.");
+                return;
+            }
+
+            // UI 상태 업데이트
+            errorMessage.classList.add('hidden');
+            analysisResults.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            loadingIndicator.classList.remove('hidden');
+            analyzeButton.disabled = true;
+            analyzeButton.innerText = '분석 중...';
+            
+            const systemPrompt = `당신은 30년 경력의 웹 개발 전문가이자 수학 교육 분석가입니다. 사용자가 입력한 고등학교 공통수학1, 2 학생 활동 결과를 분석하여 수학과 교육과정의 6가지 역량을 기준으로 구조화된 JSON 응답을 생성해야 합니다.
+            
+            분석 시 다음 교수 전략과 평가 기준을 반영해야 합니다:
+            1. **핵심 평가**: '문제 해결' 역량을 가장 중요하게 평가해야 합니다. (점수 1~5점 부여)
+            2. **교수 전략**: 직접 교수법을 통한 체계적인 학습 지도와 실시간 질의응답 세션을 통한 피드백 제공을 전제로 학생의 활동 수준을 평가합니다.
+            3. **주요 목표**: 개념 이해, 문제 해결 능력 향상, 창의성, 실생활과의 연결성 등을 종합적으로 고려합니다. (예시 주제: 전기요금 계산을 통한 에너지 절약 계획).
+            4. **창의성 측정**: 주어진 개념을 이용해 새로운 문제를 만들거나 해결책을 창의적으로 제시했는지 평가합니다.
+            5. **문제 해결 동작 평가**: 피어 리뷰를 통해 타인의 해결 방법과 비교 분석하는 과정을 거쳤는지 고려하여 평가합니다.
+            6. **실생활 연결**: 일상에서 접하는 기본적인 수학적 문제를 선택했는지 여부를 고려합니다.
+
+            분석은 다음 6가지 역량에 대한 상세 설명과 함께 JSON 스키마를 준수해야 합니다. 답변은 모두 한국어로 작성되어야 합니다.`;
+
+            const userQuery = `다음은 고등학교 1학년 학생의 수학 활동 내용입니다. 활동 결과를 분석하고 평가해주세요:
+            ---
+            [활동 내용]
+            ${description}
+            ---
+            
+            [6가지 수학 역량 정의]
+            1. 문제 해결: 목표를 이해하고 계획을 수립, 실행, 검토하는 능력. (가장 중요)
+            2. 추론: 수학적 사실로부터 논리적으로 결론을 도출하고 정당화하는 능력.
+            3. 창의·융합: 수학적 지식과 기능을 바탕으로 새로운 아이디어를 창출하고 다양한 지식과 연결하는 능력.
+            4. 의사소통: 수학적 아이디어를 표현하고 이해하며 토론하는 능력.
+            5. 정보 처리: 자료를 수집, 정리, 분석하고 적절한 도구를 활용하는 능력.
+            6. 태도 및 실천: 수학적 가치를 인식하고 자율적 학습 태도를 가지며 실천하는 능력.
+            
+            요구된 JSON 형식에 맞춰 분석 결과를 생성해주세요.`;
+
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: responseSchema
+                }
+            };
+
+            let response = null;
+            let attempts = 0;
+            const maxAttempts = 5;
+
+            // Exponential backoff 구현
+            while (attempts < maxAttempts) {
+                try {
+                    const delay = Math.pow(2, attempts) * 1000 + Math.random() * 1000;
+                    if (attempts > 0) await new Promise(resolve => setTimeout(resolve, delay));
+
+                    const fetchResponse = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!fetchResponse.ok) {
+                        throw new Error(`HTTP error! status: ${fetchResponse.status}`);
+                    }
+
+                    response = await fetchResponse.json();
+                    
+                    const jsonText = response.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!jsonText) {
+                         throw new Error("API 응답에서 분석 결과를 찾을 수 없습니다. (빈 응답)");
+                    }
+                    
+                    const parsedData = JSON.parse(jsonText);
+                    renderResults(parsedData);
+                    break; // 성공 시 루프 종료
+
+                } catch (e) {
+                    console.error(`Attempt ${attempts + 1} failed:`, e);
+                    attempts++;
+                    if (attempts === maxAttempts) {
+                        showError("죄송합니다. 활동 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+                    }
+                }
+            }
+            
+            // 최종 UI 상태 정리
+            loadingIndicator.classList.add('hidden');
+            analyzeButton.disabled = false;
+            analyzeButton.innerText = '활동 역량 분석 시작';
+        }
+
+        // 오류 메시지를 화면에 표시하는 함수
+        function showError(message) {
+            errorText.innerText = message;
+            errorMessage.classList.remove('hidden');
+            resultSection.classList.remove('hidden');
+            analysisResults.classList.add('hidden'); // 결과 숨기기
+        }
+
+        // 이벤트 리스너 연결
+        analyzeButton.addEventListener('click', analyzeActivity);
+        
+        // 초기 로딩 시 입력 필드에 예시 텍스트 설정
+        window.onload = () => {
+             const defaultText = "지역 환경 문제 해결을 위해 '미세먼지 농도 변화 예측' 프로젝트를 진행했습니다. 5일간의 측정 데이터를 수집한 후, 이를 바탕으로 일차 함수 모델을 구축하고 다음 날 농도를 예측했습니다. 팀원들과 예측 모델의 오차를 줄이는 방법을 활발하게 토론하고, 이 과정을 문서화하여 피어 리뷰를 요청했습니다. 최종적으로 미세먼지 저감 캠페인 아이디어를 함께 제시했습니다.";
+             activityDescription.value = defaultText;
+        };
+        
+    </script>
+</body>
+</html>
